@@ -1,4 +1,4 @@
-module dokku-common
+module github.com/newm4n/dokku-common
 
 go 1.21
 

@@ -3,9 +3,9 @@ package dokku_common
 import (
 	"context"
 	"crypto/rsa"
-	"dokku-common/security"
 	"fmt"
 	"github.com/SermoDigital/jose/crypto"
+	"github.com/newm4n/dokku-common/security"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )
