@@ -29,7 +29,7 @@ func RequestMayThrough(request *http.Request, tenant, role string) bool {
 		for _, aud := range goClaim.Audience {
 			tr, err := security.NewTenantRole(aud)
 			if err != nil {
-				logrus.Debugf("error while creating tenant-role got ", err.Error())
+				logrus.Debugf("error while creating tenant-role got %s", err.Error())
 				continue
 			}
 			if tr.Validates(tenant, role) {

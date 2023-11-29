@@ -36,27 +36,33 @@ func NewGoClaimFromToken(tokenString string, verifyKey *rsa.PublicKey, signM *cr
 	}
 	claims := jwt.Claims()
 	gc := &GoClaim{}
-	for k, v := range claims {
-		if strings.EqualFold(k, "iss") {
-			gc.Issuer = v.(string)
-		} else if strings.EqualFold(k, "sub") {
-			gc.Subscriber = v.(string)
-		} else if strings.EqualFold(k, "aud") {
-			arrs := v.([]interface{})
-			gc.Audience = make([]string, 0)
-			for _, str := range arrs {
-				gc.Audience = append(gc.Audience, str.(string))
-			}
-		} else if strings.EqualFold(k, "typ") {
-			gc.TokenType = TokenType(v.(string))
-		} else if strings.EqualFold(k, "nbf") {
-			gc.NotBefore = time.Unix(v.(int64), 0)
-		} else if strings.EqualFold(k, "iat") {
-			gc.IssuedAt = time.Unix(v.(int64), 0)
-		} else if strings.EqualFold(k, "exp") {
-			gc.ExpireAt = time.Unix(v.(int64), 0)
-		} else if strings.EqualFold(k, "jti") {
-			gc.Tokenid = v.(string)
+
+	if iss, ok := claims.Issuer(); ok {
+		gc.Issuer = iss
+	}
+	if sub, ok := claims.Subject(); ok {
+		gc.Subscriber = sub
+	}
+	if aud, ok := claims.Audience(); ok && len(aud) > 0 {
+		gc.Audience = aud
+	}
+	if nbf, ok := claims.NotBefore(); ok {
+		gc.NotBefore = nbf
+	}
+	if iat, ok := claims.IssuedAt(); ok {
+		gc.IssuedAt = iat
+	}
+	if exp, ok := claims.Expiration(); ok {
+		gc.ExpireAt = exp
+	}
+	if jit, ok := claims.JWTID(); ok {
+		gc.Tokenid = jit
+	}
+	if typ, ok := claims.Get("typ").(string); ok {
+		if typ == string(RefreshToken) {
+			gc.TokenType = RefreshToken
+		} else {
+			gc.TokenType = AccessToken
 		}
 	}
 	return gc, nil
@@ -144,6 +150,7 @@ func (gc *GoClaim) String() string {
 func (gc *GoClaim) ToToken(signing *rsa.PrivateKey, signM *crypto.SigningMethodRSA) (string, error) {
 
 	claims := jws.Claims{}
+
 	if len(gc.Issuer) > 0 {
 		claims.SetIssuer(gc.Issuer)
 	}
