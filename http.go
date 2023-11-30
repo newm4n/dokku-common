@@ -89,13 +89,13 @@ func UserTokenContextMiddleware(next http.Handler) http.Handler {
 				w.Write([]byte("Authorization header found, but it seems that it uses wrong bearer string"))
 				return
 			}
-			if publicKey == nil {
+			if GetPublicKey(nil) == nil {
 				w.Header().Add("Content-Type", "text/plain")
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte("Authorization header found, but public key for verification is not configured"))
 				return
 			}
-			goClaim, err := security.NewGoClaimFromToken(AuthHeader[7:], publicKey, crypto.SigningMethodRS512)
+			goClaim, err := security.NewGoClaimFromToken(AuthHeader[7:], GetPublicKey(nil), crypto.SigningMethodRS512)
 			if err != nil {
 				w.Header().Add("Content-Type", "text/plain")
 				w.WriteHeader(http.StatusForbidden)
