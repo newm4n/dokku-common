@@ -135,9 +135,11 @@ func GetPrivateKey(privateKeyPEM []byte) *rsa.PrivateKey {
 	if privateKey != nil {
 		return privateKey
 	}
-	if priKey, err := security.BytesToPrivateKey(privateKeyPEM); err == nil {
-		privateKey = priKey
-		return privateKey
+	if privateKeyPEM != nil {
+		if priKey, err := security.BytesToPrivateKey(privateKeyPEM); err == nil {
+			privateKey = priKey
+			return privateKey
+		}
 	}
 	logrus.Errorf("Can not load private key from file, using default private key. THIS IS NOT SAVE")
 	priKey, err := security.BytesToPrivateKey([]byte(DefaultPrivatePEM))
@@ -154,9 +156,11 @@ func GetPublicKey(publicKeyPEM []byte) *rsa.PublicKey {
 		fmt.Println("Gobal variable publicKey is not nil")
 		return publicKey
 	}
-	if pubKey, err := security.BytesToPublicKey(publicKeyPEM); err == nil {
-		publicKey = pubKey
-		return publicKey
+	if publicKeyPEM != nil {
+		if pubKey, err := security.BytesToPublicKey(publicKeyPEM); err == nil {
+			publicKey = pubKey
+			return publicKey
+		}
 	}
 	logrus.Error("Can not load public key from file, using default public key. THIS IS NOT SAVE")
 	pubKey, err := security.BytesToPublicKey([]byte(DefaultPublicPEM))
